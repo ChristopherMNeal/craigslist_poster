@@ -84,8 +84,8 @@ loop do
   posting_signoff = <<~POSTING_SIGNOFF
     
     
-    Feel free to text or call. I'm free just about anytime so just let me know when you'd like to come by!
-    I'll take this listing down when it is sold.
+    Feel free to text or call. Please don't email I'm free just about anytime so just let me know when you'd like to come by!
+    I'll take this listing down when it is gone.
   POSTING_SIGNOFF
   driver.find_element(:id, "PostingBody").send_keys posting_signoff
 
@@ -98,8 +98,8 @@ loop do
   next_button = wait.until { driver.find_element(:id, "ui-id-6") }
   next_button.click
 
-  driver.find_element(:name, "see_my_other").click
-  driver.find_element(:name, "delivery_available").click
+  # driver.find_element(:name, "see_my_other").click
+  # driver.find_element(:name, "delivery_available").click
   driver.find_element(:name, "show_phone_ok").click
   driver.find_element(:name, "contact_phone_ok").click
   driver.find_element(:name, "contact_text_ok").click
@@ -140,7 +140,7 @@ loop do
     publish_button.click
 
     begin
-      phone_verification_input = wait.until { driver.find_element(:css, 'input.json-form-input[name="pn_number"]') }
+      phone_verification_input = Selenium::WebDriver::Wait.new(timeout: 2).until { driver.find_element(:css, 'input.json-form-input[name="pn_number"]') }
       puts 'Uh oh. Phone verification time. Please enter the code and press Enter.'
       phone_verification_input.send_keys '8504851398'
     rescue Selenium::WebDriver::Error::TimeoutError
@@ -150,9 +150,9 @@ loop do
     puts "Couldn't find the continue button. Press Enter when you're ready for the next post."
   end
 
-  puts "Press 'q' to quit or any other key to repeat..."
-  input = $stdin.gets.chomp
-  break if input == 'q'
+  # puts "Press 'q' to quit or any other key to repeat..."
+  # input = $stdin.gets.chomp
+  # break if input == 'q'
 
   driver.navigate.to 'https://accounts.craigslist.org/login/home'
 end
