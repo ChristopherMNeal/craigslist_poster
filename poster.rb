@@ -133,9 +133,9 @@ rescue Selenium::WebDriver::Error::NoSuchElementError
 end
 
 
-# count = 0
+count = 0
+throttle_start_time = Time.now
 loop do
-  # first_post_time = count % 5 == 0 ? Time.now : first_post_time
   begin
     wait_and_find(short_wait, :partial_link_text, EMAIL, 'email link')
   rescue Selenium::WebDriver::Error::TimeoutError
@@ -157,7 +157,7 @@ loop do
   initial_button_states =
     wait_and_find_elements(short_wait, :css, 'input[type="radio"].json-form-input.id')&.map(&:selected?)
 
-  count = 0
+  wait_count = 0
   loop do
     # Re-fetching the elements to avoid stale references
     radio_buttons = @driver.find_elements(:css, 'input[type="radio"].json-form-input.id')
@@ -169,9 +169,9 @@ loop do
       break
     end
 
-    puts "waiting#{'.' * (count / 6)}" if count % 6 == 0
+    puts "waiting#{'.' * (wait_count / 6)}" if wait_count % 6 == 0
     sleep 0.5
-    count += 1
+    wait_count += 1
   rescue Selenium::WebDriver::Error::StaleElementReferenceError
     wait_for_input('Stale Element error from radio buttons. Press enter to fill out the boilerplate.')
     break
@@ -237,6 +237,13 @@ loop do
     end
   rescue Selenium::WebDriver::Error::TimeoutError
     puts "Couldn't find the continue button. Press Enter when you're ready for the next post."
+  end
+
+  # Throttle posts to 5 every 10 minutes (or whatever the configuration is), otherwise Craigslist will show an error page.
+  if count % 5 == 0 && Time.now - throttle_start_time < THROTTLE_POST_SECONDS
+    puts "Throttling until #{(throttle_start_time + THROTTLE_POST_SECONDS).strftime('%H:%M:%S')}"
+    sleep 1 until Time.now - throttle_start_time >= THROTTLE_POST_SECONDS
+    throttle_start_time = Time.now
   end
 
   unless AUTO_REPEAT
