@@ -244,6 +244,7 @@ loop do
     puts "Throttling until #{(throttle_start_time + THROTTLE_POST_SECONDS).strftime('%H:%M:%S')}"
     sleep 1 until Time.now - throttle_start_time >= THROTTLE_POST_SECONDS
     throttle_start_time = Time.now
+    puts 'Throttle lifted! Ready to post again.'
   end
 
   unless AUTO_REPEAT
